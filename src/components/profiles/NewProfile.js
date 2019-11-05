@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
@@ -6,13 +6,20 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
-import FormControl from '@material-ui/core/FormControl';
 import TextField from '@material-ui/core/TextField';
 
 export default function NewProfile(props) {
   const classes = useStyles();
-  const [modalStyle] = React.useState(getModalStyle);
-  const [open, setOpen] = React.useState(false);
+  // eslint-disable-next-line
+  const [modalStyle] = useState(getModalStyle);
+  const [open, setOpen] = useState(false);
+
+  const [profile, setProfile] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    about: ''
+  });
 
   const handleOpen = () => {
     setOpen(true);
@@ -22,10 +29,26 @@ export default function NewProfile(props) {
     setOpen(false);
   };
 
-  const handleSubmit = () => {
-    
+  const onSubmit = e => {
+    e.preventDefault();
+    props.addProfile(profile);
+    setProfile({
+      firstName: '',
+      lastName: '',
+      email: '',
+      about: ''
+    })
     handleClose();
   }
+
+  // const onChange = e => setProfile(e.target.value);
+  const onChange = e => {
+    e.persist();
+    setProfile(profile => ({
+      ...profile, [e.target.name]: e.target.value
+    }));
+  }
+
   return (
     <div>
       <Button
@@ -42,57 +65,65 @@ export default function NewProfile(props) {
         className= "modalStyle"
       >
         <Card className={classes.card}>
-          <CardContent>
-            <Typography variant="h5" color="textPrimary" gutterBottom>
-              New Profile
-            </Typography>
-            <FormControl className={classes.formContainer}>
+          <form className={classes.formContainer} onSubmit={onSubmit}>
+            <CardContent>
+              <Typography variant="h5" color="textPrimary" gutterBottom>
+                New Profile
+              </Typography>
               <TextField
-                id="fName"
+                name="firstName"
+                value={profile.firstName}
                 className={classes.textField}
                 label="First Name"
                 margin="normal"
+                onChange={onChange}
               />
               <TextField
-                id="lName"
+                name="lastName"
+                value={profile.lastName}
                 className={classes.textField}
                 label="Last Name"
                 margin="normal"
+                onChange={onChange}
               />
               <TextField
-                id="email"
+                name="email"
+                value={profile.email}
                 className={classes.textField}
                 label="Email"
                 margin="normal"
+                onChange={onChange}
               />
               <TextField
-                id="about"
+                name="about"
+                value={profile.about}
                 className={classes.textField}
                 label="About"
                 margin="normal"
+                onChange={onChange}
               />
-            </FormControl>
-          </CardContent>
-          <CardActions>
-            <Button
-              size="small"
-              variant="contained"
-              color="secondary"
-              className={classes.button}
-              onClick={handleSubmit}
-            >
-              Save
-            </Button>
-            <Button
-              size="small"
-              variant="outlined"
-              color="secondary"
-              className={classes.button}
-              onClick={handleClose}
-            >
-              Cancel
-            </Button>
-          </CardActions>
+            </CardContent>
+            <CardActions>
+              <Button
+                type="submit"
+                size="small"
+                variant="contained"
+                color="secondary"
+                className={classes.button}
+              >
+                Save
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                color="secondary"
+                className={classes.button}
+                onClick={handleClose}
+              >
+                Cancel
+              </Button>
+            </CardActions>
+          </form>
         </Card>
 
       </Modal>
@@ -132,7 +163,7 @@ const useStyles = makeStyles(theme => ({
     margin: 'auto',
     marginTop: '2em',
     padding: '1em 2em',
-    width: '50%',
+    width: '40%',
     maxWidth: '500px',
     minWidth: '300px',
   },

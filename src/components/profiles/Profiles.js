@@ -20,6 +20,9 @@ const classes = makeStyles({
   table: {
     minWidth: 650,
   },
+  container: {
+    maxWidth: '20%',
+  }
 });
 
 
@@ -36,10 +39,25 @@ export class Profiles extends Component {
     });
   }
 
+  // Add Profile
+  addProfile = profile => {
+    console.log(profile);
+    Axios.post("/api/pro", {
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      email: profile.email,
+      about: profile.about,
+      fileFileId: 0
+    }).then(res =>
+      this.setState({
+        ...this.state.profiles.push(res.data)
+      }));
+  };
+
   delProfile = profileId => {
     Axios.delete("/api/pro/profile/"+profileId).then(res =>
       this.setState({
-        todos: [...this.state.profiles.filter(profile => profile.profileId !== profileId)]
+        profiles: [...this.state.profiles.filter(profile => profile.profileId !== profileId)]
       })
     );
   }
@@ -53,7 +71,7 @@ export class Profiles extends Component {
   render() {
     return (
       <React.Fragment>
-        <NewProfile addProfile={this.props.addProfile}/>
+        <NewProfile addProfile={this.addProfile}/>
         <ProfileTable
           profiles={this.state.profiles}
           getProfile={this.getProfile}
@@ -67,7 +85,7 @@ export class Profiles extends Component {
 class ProfileTable extends Component {
   render() {
     return (
-      <div>
+      <div className={classes.container}>
         <Paper className={classes.root}>
           <Table className={classes.table}>
             <ProfileTableHead/>
