@@ -17,7 +17,7 @@ class App extends React.Component {
           <Route exact path="/profiles">
             <Profiles/>
           </Route>
-          <Route exact path="/profile/">
+          <Route exact path="/profile/:profileId">
             <ProfileDetails/>
           </Route>  
           {/* <Route path="/newProfile" component={NewProfile}/>  */}

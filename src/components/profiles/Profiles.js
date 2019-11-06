@@ -1,112 +1,102 @@
-import React, { Component } from "react";
-import { makeStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import DeleteIcon from '@material-ui/icons/Delete';
-import IconButton from '@material-ui/core/IconButton';
-import { Redirect } from 'react-router';
+import React, { useState, useEffect, Component } from "react";
+import { withRouter } from "react-router-dom";
+import { makeStyles } from "@material-ui/core/styles";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import Paper from "@material-ui/core/Paper";
+import DeleteIcon from "@material-ui/icons/Delete";
+import IconButton from "@material-ui/core/IconButton";
 
 import Axios from "axios";
 import NewProfile from "./NewProfile";
 
 const classes = makeStyles({
   root: {
-    width: '100%',
-    overflowX: 'auto',
+    width: "100%",
+    overflowX: "auto"
   },
   table: {
-    minWidth: 650,
+    minWidth: 650
   },
   container: {
-    maxWidth: '20%',
+    maxWidth: "20%"
   }
 });
 
+function Profiles(props) {
+  const [profiles, setProfiles] = useState([]);
 
+  const routeChange = (profileId) => {
+    let path = '/profile/'+profileId;
+    props.history.push(path);
+  };
 
-
-export class Profiles extends Component {
-  state = {
-    profiles: [],
-    redirectToProfile: false,
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     Axios.get("/api/pro/profiles").then(res => {
-      this.setState({ profiles: res.data });
+      setProfiles(res.data);
     });
-  }
+  }, []);
 
   // Add Profile
-  addProfile = profile => {
-    console.log(profile);
+  const addProfile = profile => {
     Axios.post("/api/pro", {
       firstName: profile.firstName,
       lastName: profile.lastName,
       email: profile.email,
       about: profile.about,
       fileFileId: 0
-    }).then(res =>
-      this.setState({
-        ...this.state.profiles.push(res.data)
-      }));
+    }).then(({ data }) => setProfiles([...profiles, data]));
   };
 
-  delProfile = profileId => {
-    Axios.delete("/api/pro/profile/"+profileId).then(res =>
-      this.setState({
-        profiles: [...this.state.profiles.filter(profile => profile.profileId !== profileId)]
-      })
-    );
-  }
+  const getProfile = () => {};
 
-  getProfile = profileId => {
-    Axios.get("/api/pro/profile/"+profileId).then(res => {
-      // Redirect to profile page
-      this.setState(() => ({ redirectToProfile: true }))
-    });
-  }
-  
-  render() {
-    // Redirect to a clicked profile
-    if (this.state.redirectToProfile === true) {
-      return <Redirect to='/profile/' />
-    }
-
-    return (
-      <React.Fragment>
-        <NewProfile addProfile={this.addProfile}/>
-        <ProfileTable
-          profiles={this.state.profiles}
-          getProfile={this.getProfile}
-          delProfile={this.delProfile}
-        />
-      </React.Fragment>
+  const delProfile = profileId => {
+    Axios.delete("/api/pro/profile/" + profileId).then(res =>
+      setProfiles([
+        ...profiles.filter(profile => profile.profileId !== profileId)
+      ])
     );
-  }
+  };
+
+  // getProfile = profileId => {
+  //   Axios.get("/api/pro/profile/"+profileId).then(res => {
+  //     // Redirect to profile page
+  //     this.setState(() => ({ redirectToProfile: true }))
+  //   });
+  // }
+
+  return (
+    <React.Fragment>
+      <NewProfile addProfile={addProfile} />
+      <ProfileTable
+        profiles={profiles}
+        getProfile={getProfile}
+        delProfile={delProfile}
+        routeChange={routeChange}
+      />
+    </React.Fragment>
+  );
 }
 
-class ProfileTable extends Component {
-  render() {
-    return (
-      <div className={classes.container}>
-        <Paper className={classes.root}>
-          <Table className={classes.table}>
-            <ProfileTableHead/>
-            <ProfileTableBody
-              profiles={this.props.profiles}
-              getProfile={this.props.getProfile}
-              delProfile={this.props.delProfile}
-              />
-          </Table>
-        </Paper>
-      </div>
-    )
-  }
+function ProfileTable(props) {
+  return (
+    <div className={classes.container}>
+      <Paper className={classes.root}>
+        <Table className={classes.table}>
+          <ProfileTableHead />
+          <ProfileTableBody
+            profiles={props.profiles}
+            getProfile={props.getProfile}
+            delProfile={props.delProfile}
+            routeChange={props.routeChange}
+          />
+        </Table>
+      </Paper>
+    </div>
+  );
 }
 
 function ProfileTableHead() {
@@ -119,18 +109,18 @@ function ProfileTableHead() {
         <TableCell>Delete</TableCell>
       </TableRow>
     </TableHead>
-  )
+  );
 }
 
 class ProfileTableBody extends Component {
   render() {
-    return(
+    return (
       <TableBody>
         {this.props.profiles.map(profile => (
           <TableRow
             key={profile.profileId}
             hover
-            onClick={this.props.getProfile.bind(this, profile.profileId)}
+            onClick={this.props.routeChange.bind(this, profile.profileId)}
           >
             <TableCell>{profile.profileId}</TableCell>
             <TableCell>{profile.firstName}</TableCell>
@@ -151,6 +141,4 @@ class ProfileTableBody extends Component {
   }
 }
 
-
-
-export default Profiles;
+export default withRouter(Profiles);

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { withRouter } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Axios from "axios";
 import Button from "@material-ui/core/Button";
@@ -8,7 +9,7 @@ import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 
-export default function ProfileDetails(props) {
+function ProfileDetails(props) {
   const [profile, setProfile] = useState({
     firstName: '',
     lastName: '',
@@ -16,11 +17,17 @@ export default function ProfileDetails(props) {
     about: ''
   });
 
-  useEffect(profileId => {
-    Axios.get("/api/pro/profile/30").then(res => {
+  useEffect(() => {
+    // grab id from url path param
+    const profileId = props.match.params.profileId;
+    Axios.get("/api/pro/profile/"+profileId).then(res => {
       setProfile(res.data);
     });
-  }, []);
+  }, [props.match.params.profileId]);
+
+  const routeChange = () => {
+    props.history.goBack();
+  };
 
   const onChange = e => {
     e.persist();
@@ -37,7 +44,12 @@ export default function ProfileDetails(props) {
 
   return (
     <div>
-      <ProfileCard profile={profile} onChange={onChange} />
+      <ProfileCard
+        profile={profile}
+        onChange={onChange}
+        onSubmit={onSubmit}
+        routeChange={routeChange}
+      />
     </div>
   );
 }
@@ -92,6 +104,7 @@ function ProfileCard(props) {
             variant="contained"
             color="secondary"
             className={classes.button}
+            onClick={props.onSubmit}
           >
             Save
           </Button>
@@ -100,6 +113,7 @@ function ProfileCard(props) {
             variant="outlined"
             color="secondary"
             className={classes.button}
+            onClick={props.routeChange}
           >
             Back
           </Button>
@@ -154,3 +168,6 @@ const useStyles = makeStyles(theme => ({
     width: 200
   }
 }));
+
+
+export default withRouter(ProfileDetails);
