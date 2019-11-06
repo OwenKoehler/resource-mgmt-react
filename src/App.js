@@ -2,6 +2,7 @@ import React from 'react';
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Header from './components/layout/Header';
 import Profiles from './components/profiles/Profiles';
+import ProfileDetails from './components/profiles/ProfileDetails';
 
 
 import './App.css';
@@ -15,6 +16,9 @@ class App extends React.Component {
           <Header/>
           <Route exact path="/profiles">
             <Profiles/>
+          </Route>
+          <Route exact path="/profile/">
+            <ProfileDetails/>
           </Route>  
           {/* <Route path="/newProfile" component={NewProfile}/>  */}
         </div>

@@ -8,6 +8,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import DeleteIcon from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
+import { Redirect } from 'react-router';
 
 import Axios from "axios";
 import NewProfile from "./NewProfile";
@@ -30,7 +31,8 @@ const classes = makeStyles({
 
 export class Profiles extends Component {
   state = {
-    profiles: []
+    profiles: [],
+    redirectToProfile: false,
   }
 
   componentDidMount() {
@@ -63,12 +65,18 @@ export class Profiles extends Component {
   }
 
   getProfile = profileId => {
-    Axios.get("/api/pro/profile/"+profileId).then(res =>
-      console.log(res.data)
-    );
+    Axios.get("/api/pro/profile/"+profileId).then(res => {
+      // Redirect to profile page
+      this.setState(() => ({ redirectToProfile: true }))
+    });
   }
   
   render() {
+    // Redirect to a clicked profile
+    if (this.state.redirectToProfile === true) {
+      return <Redirect to='/profile/' />
+    }
+
     return (
       <React.Fragment>
         <NewProfile addProfile={this.addProfile}/>
