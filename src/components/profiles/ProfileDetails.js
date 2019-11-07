@@ -8,23 +8,37 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
-import MySnackbar from "../layout/MySnackbar"
+import MySnackbar from "../layout/MySnackbar";
+import InfoSnackbar from "../layout/InfoSnackbar";
 
 function ProfileDetails(props) {
+  const classes = useStyles();
   const [profile, setProfile] = useState({
+    profileId: "",
     firstName: "",
     lastName: "",
     email: "",
     about: ""
   });
+  const [evaluation, setEvaluation] = useState({
+    evaluationId: "",
+    reviewer: "",
+    rating: "",
+    technologies: "",
+    interviewDate: ""
+  });
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [openInfoSnackbar, setOpenInfoSnackbar] = useState(false);
 
   useEffect(() => {
     // grab id from url path param
     const profileId = props.match.params.profileId;
-    axios.get("/api/pro/profile/" + profileId).then(res => {
-      setProfile(res.data);
-    });
+
+    // get profile
+    getProfile(profileId);
+
+    // get evaluation
+    getEvaluation(profileId);
   }, [props.match.params.profileId]);
 
   const routeChange = () => {
@@ -39,30 +53,74 @@ function ProfileDetails(props) {
     }));
   };
 
-  const updateProfile = profile => {
-    axios
-      .put("/api/pro", profile)
-      .then(response => {
-      });
+  const evaluationOnChange = e => {
+    e.persist();
+    setEvaluation(evaluation => ({
+      ...evaluation,
+      [e.target.name]: e.target.value
+    }));
   };
 
-  const onSubmit = e => {
+  const getProfile = profileId => {
+    axios.get("/api/pro/profile/" + profileId).then(res => {
+      setProfile(res.data);
+    });
+  };
+
+  const updateProfile = profile => {
+    axios.put("/api/pro", profile);
+  };
+
+  const undoProfileChanges = profileId => {
+    getProfile(profileId);
+    setOpenInfoSnackbar(true);
+  };
+
+  const onSubmitProfile = e => {
     e.preventDefault();
     updateProfile(profile);
     setOpenSnackbar(true);
   };
 
+  const getEvaluation = profileId => {
+    axios.get("/api/eval/evaluation/" + profileId).then(res => {
+      setEvaluation(res.data);
+    });
+  };
+
+  const updateEvaluation = evaluation => {
+    axios.put("/api/eval", evaluation);
+  };
+
+  const undoEvaluationChanges = profileId => {
+    getEvaluation(profileId);
+    setOpenInfoSnackbar(true);
+  };
+
+  const onSubmitEvaluation = e => {
+    e.preventDefault();
+    updateEvaluation(evaluation);
+    setOpenSnackbar(true);
+  };
+
   return (
-    <div>
-      <MySnackbar
-        open={openSnackbar}
-        onClose={() => setOpenSnackbar(false)}
+    <div className={classes.container}>
+      <MySnackbar open={openSnackbar} onClose={() => setOpenSnackbar(false)} />
+      <InfoSnackbar
+        open={openInfoSnackbar}
+        onClose={() => setOpenInfoSnackbar(false)}
       />
       <ProfileCard
         profile={profile}
         onChange={onChange}
-        onSubmit={onSubmit}
-        routeChange={routeChange}
+        onSubmit={onSubmitProfile}
+        undoChanges={undoProfileChanges}
+      />
+      <EvaluationCard
+        evaluation={evaluation}
+        onChange={evaluationOnChange}
+        onSubmit={onSubmitEvaluation}
+        undoChanges={undoEvaluationChanges}
       />
     </div>
   );
@@ -70,7 +128,7 @@ function ProfileDetails(props) {
 
 function ProfileCard(props) {
   const classes = useStyles();
-  const { profile, onSubmit, onChange } = props;
+  const { profile, onSubmit, onChange, undoChanges } = props;
   return (
     <div>
       <Card className={classes.card}>
@@ -105,6 +163,7 @@ function ProfileCard(props) {
             />
             <TextField
               name="about"
+              multiline
               value={profile.about}
               className={classes.textField}
               label="About"
@@ -119,18 +178,89 @@ function ProfileCard(props) {
               variant="contained"
               color="secondary"
               className={classes.button}
-              onClick={props.onSubmit}
+              onClick={onSubmit}
             >
-              Save
+              Save Changes
             </Button>
             <Button
               size="small"
               variant="outlined"
               color="secondary"
               className={classes.button}
-              onClick={props.routeChange}
+              onClick={undoChanges.bind(this, profile.profileId)}
             >
-              Back
+              Undo Changes
+            </Button>
+          </CardActions>
+        </form>
+      </Card>
+    </div>
+  );
+}
+
+function EvaluationCard(props) {
+  const classes = useStyles();
+  const { evaluation, onChange, onSubmit, undoChanges } = props;
+  return (
+    <div>
+      <Card className={classes.card}>
+        <form className={classes.formContainer} onSubmit={onSubmit}>
+          <CardContent>
+            <Typography variant="h5" color="textPrimary" gutterBottom>
+              Evaluation
+            </Typography>
+            <TextField
+              name="reviewer"
+              value={evaluation.reviewer}
+              className={classes.textField}
+              label="Reviewer"
+              margin="normal"
+              onChange={onChange}
+            />
+            <TextField
+              name="rating"
+              value={evaluation.rating}
+              className={classes.textField}
+              label="Rating"
+              margin="normal"
+              onChange={onChange}
+            />
+            <TextField
+              name="technologies"
+              value={evaluation.technologies}
+              className={classes.textField}
+              label="Technologies"
+              margin="normal"
+              onChange={onChange}
+            />
+            <TextField
+              name="interviewDate"
+              value={evaluation.interviewDate}
+              className={classes.textField}
+              label="Interview Date"
+              margin="normal"
+              onChange={onChange}
+            />
+          </CardContent>
+          <CardActions>
+            <Button
+              type="submit"
+              size="small"
+              variant="contained"
+              color="secondary"
+              className={classes.button}
+              onClick={onSubmit}
+            >
+              Save Changes
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              color="secondary"
+              className={classes.button}
+              onClick={undoChanges.bind(this, evaluation.evaluationId)}
+            >
+              Undo Changes
             </Button>
           </CardActions>
         </form>
@@ -140,6 +270,9 @@ function ProfileCard(props) {
 }
 
 const useStyles = makeStyles(theme => ({
+  container: {
+    marginBottom: "2em"
+  },
   paper: {
     position: "absolute",
     width: 400,
@@ -181,7 +314,7 @@ const useStyles = makeStyles(theme => ({
   textField: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
-    width: 200
+    width: "100%"
   }
 }));
 

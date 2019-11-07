@@ -91,8 +91,8 @@ export default function CustomizedSnackbars(props) {
       >
         <MySnackbarContentWrapper
           onClose={props.onClose}
-          variant="success"
-          message="Changes were saved."
+          variant="info"
+          message="Changes were undone."
         />
       </Snackbar>
     </div>

@@ -12,8 +12,9 @@ import IconButton from "@material-ui/core/IconButton";
 
 import Axios from "axios";
 import NewProfile from "./NewProfile";
+import { classes } from "istanbul-lib-coverage";
 
-const classes = makeStyles({
+const useStyles = makeStyles({
   root: {
     width: "100%",
     overflowX: "auto"
@@ -21,16 +22,23 @@ const classes = makeStyles({
   table: {
     minWidth: 650
   },
+  head: {
+    backgroundColor:"red",
+  },
   container: {
-    maxWidth: "20%"
+    maxWidth: "100%"
+  },
+  tableContainer: {
+    padding: "0em 3em",
   }
 });
 
 function Profiles(props) {
+  const classes = useStyles();
   const [profiles, setProfiles] = useState([]);
 
-  const routeChange = (profileId) => {
-    let path = '/profile/'+profileId;
+  const routeChange = profileId => {
+    let path = "/profile/" + profileId;
     props.history.push(path);
   };
 
@@ -70,24 +78,28 @@ function Profiles(props) {
 
   return (
     <React.Fragment>
-      <NewProfile addProfile={addProfile} />
-      <ProfileTable
-        profiles={profiles}
-        getProfile={getProfile}
-        delProfile={delProfile}
-        routeChange={routeChange}
-      />
+      <NewProfile classes={classes} addProfile={addProfile} />
+      <div className={classes.tableContainer}>
+        <ProfileTable
+          classes={classes}
+          profiles={profiles}
+          getProfile={getProfile}
+          delProfile={delProfile}
+          routeChange={routeChange}
+        />
+      </div>
     </React.Fragment>
   );
 }
 
 function ProfileTable(props) {
   return (
-    <div className={classes.container}>
-      <Paper className={classes.root}>
-        <Table className={classes.table}>
-          <ProfileTableHead />
+    <div className={props.classes.container}>
+      <Paper className={props.classes.root}>
+        <Table className={props.classes.table}>
+          <ProfileTableHead classes={props.classes} />
           <ProfileTableBody
+            classes={props.classes}
             profiles={props.profiles}
             getProfile={props.getProfile}
             delProfile={props.delProfile}
@@ -102,7 +114,7 @@ function ProfileTable(props) {
 function ProfileTableHead() {
   return (
     <TableHead>
-      <TableRow>
+      <TableRow className={classes.head}>
         <TableCell>ID</TableCell>
         <TableCell>First Name</TableCell>
         <TableCell>Last Name</TableCell>
@@ -117,17 +129,26 @@ class ProfileTableBody extends Component {
     return (
       <TableBody>
         {this.props.profiles.map(profile => (
-          <TableRow
-            key={profile.profileId}
-            hover
-          >
-            <TableCell onClick={this.props.routeChange.bind(this, profile.profileId)}>{profile.profileId}</TableCell>
-            <TableCell onClick={this.props.routeChange.bind(this, profile.profileId)}>{profile.firstName}</TableCell>
-            <TableCell onClick={this.props.routeChange.bind(this, profile.profileId)}>{profile.lastName}</TableCell>
+          <TableRow key={profile.profileId} hover>
+            <TableCell
+              onClick={this.props.routeChange.bind(this, profile.profileId)}
+            >
+              {profile.profileId}
+            </TableCell>
+            <TableCell
+              onClick={this.props.routeChange.bind(this, profile.profileId)}
+            >
+              {profile.firstName}
+            </TableCell>
+            <TableCell
+              onClick={this.props.routeChange.bind(this, profile.profileId)}
+            >
+              {profile.lastName}
+            </TableCell>
             <TableCell>
               <IconButton
                 color="secondary"
-                className={classes.margin}
+                className={this.props.classes.margin}
                 onClick={this.props.delProfile.bind(this, profile.profileId)}
               >
                 <DeleteIcon />
