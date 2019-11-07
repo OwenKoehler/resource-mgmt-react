@@ -120,11 +120,10 @@ class ProfileTableBody extends Component {
           <TableRow
             key={profile.profileId}
             hover
-            onClick={this.props.routeChange.bind(this, profile.profileId)}
           >
-            <TableCell>{profile.profileId}</TableCell>
-            <TableCell>{profile.firstName}</TableCell>
-            <TableCell>{profile.lastName}</TableCell>
+            <TableCell onClick={this.props.routeChange.bind(this, profile.profileId)}>{profile.profileId}</TableCell>
+            <TableCell onClick={this.props.routeChange.bind(this, profile.profileId)}>{profile.firstName}</TableCell>
+            <TableCell onClick={this.props.routeChange.bind(this, profile.profileId)}>{profile.lastName}</TableCell>
             <TableCell>
               <IconButton
                 color="secondary"

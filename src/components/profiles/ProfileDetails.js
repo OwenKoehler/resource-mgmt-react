@@ -8,6 +8,7 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
+import MySnackbar from "../layout/MySnackbar"
 
 function ProfileDetails(props) {
   const [profile, setProfile] = useState({
@@ -16,6 +17,7 @@ function ProfileDetails(props) {
     email: "",
     about: ""
   });
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   useEffect(() => {
     // grab id from url path param
@@ -38,22 +40,24 @@ function ProfileDetails(props) {
   };
 
   const updateProfile = profile => {
-    console.log(profile);
     axios
       .put("/api/pro", profile)
       .then(response => {
-        console.log(response);
       });
   };
 
   const onSubmit = e => {
     e.preventDefault();
     updateProfile(profile);
-    alert("Changes saved");
+    setOpenSnackbar(true);
   };
 
   return (
     <div>
+      <MySnackbar
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+      />
       <ProfileCard
         profile={profile}
         onChange={onChange}
@@ -68,68 +72,70 @@ function ProfileCard(props) {
   const classes = useStyles();
   const { profile, onSubmit, onChange } = props;
   return (
-    <Card className={classes.card}>
-      <form className={classes.formContainer} onSubmit={onSubmit}>
-        <CardContent>
-          <Typography variant="h5" color="textPrimary" gutterBottom>
-            Profile Details
-          </Typography>
-          <TextField
-            name="firstName"
-            value={profile.firstName}
-            className={classes.textField}
-            label="First Name"
-            margin="normal"
-            onChange={onChange}
-          />
-          <TextField
-            name="lastName"
-            value={profile.lastName}
-            className={classes.textField}
-            label="Last Name"
-            margin="normal"
-            onChange={onChange}
-          />
-          <TextField
-            name="email"
-            value={profile.email}
-            className={classes.textField}
-            label="Email"
-            margin="normal"
-            onChange={onChange}
-          />
-          <TextField
-            name="about"
-            value={profile.about}
-            className={classes.textField}
-            label="About"
-            margin="normal"
-            onChange={onChange}
-          />
-        </CardContent>
-        <CardActions>
-          <Button
-            type="submit"
-            size="small"
-            variant="contained"
-            color="secondary"
-            className={classes.button}
-            onClick={props.onSubmit}
-          >
-            Save
-          </Button>
-          <Button
-            size="small"
-            variant="outlined"
-            color="secondary"
-            className={classes.button}
-            onClick={props.routeChange}
-          >
-            Back
-          </Button>
-        </CardActions>
-      </form>
-    </Card>
+    <div>
+      <Card className={classes.card}>
+        <form className={classes.formContainer} onSubmit={onSubmit}>
+          <CardContent>
+            <Typography variant="h5" color="textPrimary" gutterBottom>
+              Profile Details
+            </Typography>
+            <TextField
+              name="firstName"
+              value={profile.firstName}
+              className={classes.textField}
+              label="First Name"
+              margin="normal"
+              onChange={onChange}
+            />
+            <TextField
+              name="lastName"
+              value={profile.lastName}
+              className={classes.textField}
+              label="Last Name"
+              margin="normal"
+              onChange={onChange}
+            />
+            <TextField
+              name="email"
+              value={profile.email}
+              className={classes.textField}
+              label="Email"
+              margin="normal"
+              onChange={onChange}
+            />
+            <TextField
+              name="about"
+              value={profile.about}
+              className={classes.textField}
+              label="About"
+              margin="normal"
+              onChange={onChange}
+            />
+          </CardContent>
+          <CardActions>
+            <Button
+              type="submit"
+              size="small"
+              variant="contained"
+              color="secondary"
+              className={classes.button}
+              onClick={props.onSubmit}
+            >
+              Save
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              color="secondary"
+              className={classes.button}
+              onClick={props.routeChange}
+            >
+              Back
+            </Button>
+          </CardActions>
+        </form>
+      </Card>
+    </div>
   );
 }
 
