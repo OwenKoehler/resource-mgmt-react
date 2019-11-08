@@ -10,6 +10,8 @@ import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import MySnackbar from "../layout/MySnackbar";
 import InfoSnackbar from "../layout/InfoSnackbar";
+import DateFnsUtils from "@date-io/date-fns";
+import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 
 function ProfileDetails(props) {
   const classes = useStyles();
@@ -21,11 +23,12 @@ function ProfileDetails(props) {
     about: ""
   });
   const [evaluation, setEvaluation] = useState({
-    evaluationId: "",
     reviewer: "",
     rating: "",
     technologies: "",
-    interviewDate: ""
+    interviewDate: new Date(),
+    email: "",
+    profileProfileId: 0
   });
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [openInfoSnackbar, setOpenInfoSnackbar] = useState(false);
@@ -41,9 +44,9 @@ function ProfileDetails(props) {
     getEvaluation(profileId);
   }, [props.match.params.profileId]);
 
-  const routeChange = () => {
-    props.history.goBack();
-  };
+  // const routeChange = () => {
+  //   props.history.goBack();
+  // };
 
   const onChange = e => {
     e.persist();
@@ -58,6 +61,13 @@ function ProfileDetails(props) {
     setEvaluation(evaluation => ({
       ...evaluation,
       [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleDateChange = date => {
+    setEvaluation(evaluation => ({
+      ...evaluation,
+      "interviewDate": date
     }));
   };
 
@@ -82,9 +92,36 @@ function ProfileDetails(props) {
     setOpenSnackbar(true);
   };
 
+  const addEvaluation = evaluation => {
+    console.log(evaluation);
+    axios
+      .post("/api/eval", {
+        evaluationId: profile.profileId,
+        reviewer: evaluation.reviewer,
+        rating: evaluation.rating,
+        technologies: evaluation.technologies,
+        interviewDate: evaluation.interviewDate,
+        profileProfileId: profile.profileId
+      })
+      .then(({ data }) => setEvaluation(data));
+  };
+
+  // const getEvaluation = profileId => {
+  //   axios.get("/api/eval/evaluation/" + profileId).then(res => {
+  //     setEvaluation(res.data);
+  //   });
+  // };
+
   const getEvaluation = profileId => {
-    axios.get("/api/eval/evaluation/" + profileId).then(res => {
-      setEvaluation(res.data);
+    axios.get("/api/eval/evaluations").then(({ data }) => {
+      const result = data.filter(
+        // eslint-disable-next-line
+        evaluation => evaluation.profileProfileId == profileId
+      );
+      if (result.length > 0) {
+        
+        setEvaluation(result.pop());
+      }
     });
   };
 
@@ -99,7 +136,10 @@ function ProfileDetails(props) {
 
   const onSubmitEvaluation = e => {
     e.preventDefault();
-    updateEvaluation(evaluation);
+    console.log(evaluation);
+    evaluation.evaluationId
+      ? updateEvaluation(evaluation)
+      : addEvaluation(evaluation);
     setOpenSnackbar(true);
   };
 
@@ -119,6 +159,7 @@ function ProfileDetails(props) {
       <EvaluationCard
         evaluation={evaluation}
         onChange={evaluationOnChange}
+        handleDateChange={handleDateChange}
         onSubmit={onSubmitEvaluation}
         undoChanges={undoEvaluationChanges}
       />
@@ -200,7 +241,7 @@ function ProfileCard(props) {
 
 function EvaluationCard(props) {
   const classes = useStyles();
-  const { evaluation, onChange, onSubmit, undoChanges } = props;
+  const { evaluation, onChange, onSubmit, undoChanges, handleDateChange } = props;
   return (
     <div>
       <Card className={classes.card}>
@@ -223,6 +264,7 @@ function EvaluationCard(props) {
               className={classes.textField}
               label="Rating"
               margin="normal"
+              type="number"
               onChange={onChange}
             />
             <TextField
@@ -233,14 +275,30 @@ function EvaluationCard(props) {
               margin="normal"
               onChange={onChange}
             />
-            <TextField
+            {/* <TextField
               name="interviewDate"
               value={evaluation.interviewDate}
               className={classes.textField}
               label="Interview Date"
               margin="normal"
               onChange={onChange}
-            />
+            /> */}
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <KeyboardDatePicker
+                name="interviewDate"
+                value={evaluation.interviewDate}
+                className={classes.textField}
+                disableToolbar
+                variant="inline"
+                format="MM/dd/yyyy"
+                margin="normal"
+                label="Interview Date"
+                onChange={handleDateChange}
+                KeyboardButtonProps={{
+                  'aria-label': 'change date',
+                }}
+              />
+            </MuiPickersUtilsProvider>
           </CardContent>
           <CardActions>
             <Button

@@ -8,6 +8,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import DeleteIcon from "@material-ui/icons/Delete";
+import EditIcon from '@material-ui/icons/Edit';
 import IconButton from "@material-ui/core/IconButton";
 
 import Axios from "axios";
@@ -59,8 +60,6 @@ function Profiles(props) {
     }).then(({ data }) => setProfiles([...profiles, data]));
   };
 
-  const getProfile = () => {};
-
   const delProfile = profileId => {
     Axios.delete("/api/pro/profile/" + profileId).then(res =>
       setProfiles([
@@ -83,7 +82,6 @@ function Profiles(props) {
         <ProfileTable
           classes={classes}
           profiles={profiles}
-          getProfile={getProfile}
           delProfile={delProfile}
           routeChange={routeChange}
         />
@@ -101,7 +99,6 @@ function ProfileTable(props) {
           <ProfileTableBody
             classes={props.classes}
             profiles={props.profiles}
-            getProfile={props.getProfile}
             delProfile={props.delProfile}
             routeChange={props.routeChange}
           />
@@ -118,7 +115,7 @@ function ProfileTableHead() {
         <TableCell>ID</TableCell>
         <TableCell>First Name</TableCell>
         <TableCell>Last Name</TableCell>
-        <TableCell>Delete</TableCell>
+        <TableCell>Actions</TableCell>
       </TableRow>
     </TableHead>
   );
@@ -146,6 +143,13 @@ class ProfileTableBody extends Component {
               {profile.lastName}
             </TableCell>
             <TableCell>
+              <IconButton
+                color="secondary"
+                className={this.props.classes.margin}
+                onClick={this.props.routeChange.bind(this, profile.profileId)}
+              >
+                <EditIcon />
+              </IconButton>
               <IconButton
                 color="secondary"
                 className={this.props.classes.margin}
