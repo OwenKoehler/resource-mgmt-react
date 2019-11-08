@@ -115,6 +115,7 @@ function ProfileTableHead() {
         <TableCell>ID</TableCell>
         <TableCell>First Name</TableCell>
         <TableCell>Last Name</TableCell>
+        <TableCell>Email</TableCell>
         <TableCell>Actions</TableCell>
       </TableRow>
     </TableHead>
@@ -141,6 +142,11 @@ class ProfileTableBody extends Component {
               onClick={this.props.routeChange.bind(this, profile.profileId)}
             >
               {profile.lastName}
+            </TableCell>
+            <TableCell
+              onClick={this.props.routeChange.bind(this, profile.profileId)}
+            >
+              {profile.email}
             </TableCell>
             <TableCell>
               <IconButton

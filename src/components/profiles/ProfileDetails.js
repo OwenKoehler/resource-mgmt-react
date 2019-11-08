@@ -93,7 +93,6 @@ function ProfileDetails(props) {
   };
 
   const addEvaluation = evaluation => {
-    console.log(evaluation);
     axios
       .post("/api/eval", {
         evaluationId: profile.profileId,
@@ -136,7 +135,6 @@ function ProfileDetails(props) {
 
   const onSubmitEvaluation = e => {
     e.preventDefault();
-    console.log(evaluation);
     evaluation.evaluationId
       ? updateEvaluation(evaluation)
       : addEvaluation(evaluation);
@@ -181,18 +179,20 @@ function ProfileCard(props) {
             <TextField
               name="firstName"
               value={profile.firstName}
-              className={classes.textField}
+              className={classes.leftHalfTextField}
               label="First Name"
               margin="normal"
               onChange={onChange}
+              multiline
             />
             <TextField
               name="lastName"
               value={profile.lastName}
-              className={classes.textField}
+              className={classes.rightHalfTextField}
               label="Last Name"
               margin="normal"
               onChange={onChange}
+              multiline
             />
             <TextField
               name="email"
@@ -261,18 +261,10 @@ function EvaluationCard(props) {
             <TextField
               name="rating"
               value={evaluation.rating}
-              className={classes.textField}
+              className={classes.leftHalfTextField}
               label="Rating"
               margin="normal"
               type="number"
-              onChange={onChange}
-            />
-            <TextField
-              name="technologies"
-              value={evaluation.technologies}
-              className={classes.textField}
-              label="Technologies"
-              margin="normal"
               onChange={onChange}
             />
             {/* <TextField
@@ -287,7 +279,7 @@ function EvaluationCard(props) {
               <KeyboardDatePicker
                 name="interviewDate"
                 value={evaluation.interviewDate}
-                className={classes.textField}
+                className={classes.rightHalfTextField}
                 disableToolbar
                 variant="inline"
                 format="MM/dd/yyyy"
@@ -299,6 +291,16 @@ function EvaluationCard(props) {
                 }}
               />
             </MuiPickersUtilsProvider>
+            <TextField
+              name="technologies"
+              value={evaluation.technologies}
+              className={classes.textField}
+              label="Technologies"
+              margin="normal"
+              onChange={onChange}
+              multiline
+              variant="outlined"
+            />
           </CardContent>
           <CardActions>
             <Button
@@ -372,7 +374,15 @@ const useStyles = makeStyles(theme => ({
   textField: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
-    width: "100%"
+    width: "95%"
+  },
+  leftHalfTextField: {
+    marginRight: "4.5%",
+    width: "43%"
+  },
+  rightHalfTextField: {
+    marginLeft: "4.5%",
+    width: "43%"
   }
 }));
 
