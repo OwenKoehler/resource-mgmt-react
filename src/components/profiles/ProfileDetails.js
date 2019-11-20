@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, withStyles } from "@material-ui/core/styles";
 import axios from "axios";
 import Button from "@material-ui/core/Button";
 import Card from "@material-ui/core/Card";
@@ -12,16 +12,19 @@ import MySnackbar from "../layout/MySnackbar";
 import InfoSnackbar from "../layout/InfoSnackbar";
 import DateFnsUtils from "@date-io/date-fns";
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import Rating from '@material-ui/lab/Rating';
 
 function ProfileDetails(props) {
   const classes = useStyles();
-  const [profile, setProfile] = useState({
-    profileId: "",
-    firstName: "",
-    lastName: "",
-    email: "",
-    about: ""
-  });
+  // const [profile, setProfile] = useState({
+  //   profileId: "",
+  //   firstName: "",
+  //   lastName: "",
+  //   email: "",
+  //   about: ""
+  // });
+  const [profile, setProfile] = useGlobal('profile');
   const [evaluation, setEvaluation] = useState({
     reviewer: "",
     rating: "",
@@ -72,9 +75,10 @@ function ProfileDetails(props) {
   };
 
   const getProfile = profileId => {
-    axios.get("/api/pro/profile/" + profileId).then(res => {
-      setProfile(res.data);
-    });
+
+    // axios.get("/api/pro/profile/" + profileId).then(res => {
+    //   setProfile(res.data);
+    // });
   };
 
   const updateProfile = profile => {
@@ -267,14 +271,15 @@ function EvaluationCard(props) {
               type="number"
               onChange={onChange}
             />
-            {/* <TextField
-              name="interviewDate"
-              value={evaluation.interviewDate}
-              className={classes.textField}
-              label="Interview Date"
-              margin="normal"
-              onChange={onChange}
-            /> */}
+            {/* <span className={classes.ratingField}>
+              <Typography component="legend">Rating</Typography>
+              <StyledRating
+                name="rating"
+                value={evaluation.rating}
+                precision={0.5}
+                icon={<FavoriteIcon fontSize="inherit" />}
+              />
+            </span> */}
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <KeyboardDatePicker
                 name="interviewDate"
@@ -383,7 +388,20 @@ const useStyles = makeStyles(theme => ({
   rightHalfTextField: {
     marginLeft: "4.5%",
     width: "43%"
+  },
+  ratingField: {
+    marginLeft: "4.5%%",
+    width: "20%",
   }
 }));
+
+const StyledRating = withStyles({
+  iconFilled: {
+    color: '#ff6d75',
+  },
+  iconHover: {
+    color: '#ff3d47',
+  },
+})(Rating);
 
 export default withRouter(ProfileDetails);

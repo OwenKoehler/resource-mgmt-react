@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Component } from "react";
+import { useGlobal } from 'reactn';
 import { withRouter } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -36,7 +37,8 @@ const useStyles = makeStyles({
 
 function Profiles(props) {
   const classes = useStyles();
-  const [profiles, setProfiles] = useState([]);
+  // const [profiles, setProfiles] = useState([]);
+  const [ profiles, setProfiles ] = useGlobal('profiles');
 
   const routeChange = profileId => {
     let path = "/profile/" + profileId;
@@ -47,7 +49,7 @@ function Profiles(props) {
     Axios.get("/api/pro/profiles").then(res => {
       setProfiles(res.data);
     });
-  }, []);
+  }, [setProfiles]);
 
   // Add Profile
   const addProfile = profile => {
